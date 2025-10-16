@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import OrderForm from '../src/OrderForm.js'; 
+import OrderForm from './OrderForm.jsx'; 
 import EditOrderModal from './EditOrderModal.jsx';
 
 // ******************************************************************
-// 🛠️ VERCEL DEPLOYMENT FIX: Absolute API URL
+// 🛠️ FINAL VERCEL FIX: RELATIVE API URL
+// Deployed Vercel Frontend par, sirf relative path /api/orders use karte hain.
+// Vercel khud hi isko full URL (https://order-tracking-frontend.vercel.app/api/orders) bana dega.
 // ******************************************************************
-const VERCEL_APP_BASE_URL = 'https://order-tracking-system-git-main-wahabph1s-projects.vercel.app';
-const API_URL = `${VERCEL_APP_BASE_URL}/api/orders`; 
+const API_URL = '/api/orders'; 
 // ******************************************************************
 
 // --- Reusable Component: Status Tag ---
@@ -39,7 +40,7 @@ const OrderTable = () => {
     const fetchOrders = useCallback(async () => {
         setLoading(true);
         setError(null);
-        let url = `${API_URL}`;
+        let url = `${API_URL}`; // Now uses relative path /api/orders
 
         // Construct query parameters
         const params = new URLSearchParams();
@@ -64,7 +65,8 @@ const OrderTable = () => {
             setOrders(data);
         } catch (e) {
             console.error("Data fetching error:", e);
-            setError(`Orders load karne mein error aa gayi hai. Check karein ki Vercel par MongoDB URI set hai. Error: ${e.message}`);
+            // Error message changed to reflect the most likely remaining issue (backend down)
+            setError(`Orders load karne mein error aa gayi hai. Server se connection nahi ho paa raha hai. Ensure karein ki backend (serverless function) deploy ho chuka ho. Error: ${e.message}`);
         } finally {
             setLoading(false);
         }
@@ -113,6 +115,7 @@ const OrderTable = () => {
     };
 
     if (loading) return <div className="status-message">Data load ho raha hai...</div>;
+    // Show error message prominently
     if (error) return <div className="error-message p-4 text-center text-xl">{error}</div>;
 
     return (
